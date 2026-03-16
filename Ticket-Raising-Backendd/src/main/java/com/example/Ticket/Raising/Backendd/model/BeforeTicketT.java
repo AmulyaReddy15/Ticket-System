@@ -25,7 +25,7 @@ public class BeforeTicketT {
 	private LocalDateTime issueDate;
 	private String issue;
 	private String description;
-	private boolean assigned = false; //  default 
+	private Boolean assigned = false; //  default 
 	
 
 }
