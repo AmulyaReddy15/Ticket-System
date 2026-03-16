@@ -24,6 +24,5 @@ public class AfterTicketT {
 	private String description;
 	private String status;
 	private String solution;
-	private Boolean visibleToClient = false; // ✅ default false
 
 }
