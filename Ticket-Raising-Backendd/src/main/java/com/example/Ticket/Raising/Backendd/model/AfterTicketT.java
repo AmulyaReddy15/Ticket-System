@@ -18,10 +18,12 @@ public class AfterTicketT {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer issueid;
+	private int beforeTicketId;  // ✅ this links both tables
 	private String issue;
 	private Date issudedate;
 	private String description;
 	private String status;
 	private String solution;
+	private boolean visibleToClient = false; // ✅ default false
 
 }

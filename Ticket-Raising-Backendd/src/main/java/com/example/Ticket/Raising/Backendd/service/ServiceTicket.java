@@ -97,9 +97,38 @@ public class ServiceTicket {
 	            .status(HttpStatus.CREATED)
 	            .body(" Ticket Raised Successfully");
 	}
+	public ResponseEntity<?> clientViewStatus() {
+		List<AfterTicketT> ticketstatusList = afterepo.findByvisibleToClient(true);
+		if (ticketstatusList.isEmpty()) {
+	        return ResponseEntity
+	                .status(HttpStatus.NOT_FOUND)
+	                .body("No tickets found");
+	    }
+	    
+	    return ResponseEntity
+	            .ok(ticketstatusList); 
+	}
 
-
-	public ResponseEntity<?> adminView(AfterTicketT afterticket) {
+	public ResponseEntity<?> pendingIssuesAdmin() {
+		List<BeforeTicketT> pendingticketslist = beforepo.findAll();
+		
+		if(pendingticketslist.isEmpty()) {
+			return ResponseEntity
+	                .status(HttpStatus.NOT_FOUND)
+	                .body("No tickets found");
+		}
+		return ResponseEntity
+	            .ok(pendingticketslist);
+	}
+	
+	public ResponseEntity<?> issuedToTechnician(BeforeTicketT beforeticket) {
+		beforeticket.setAssigned(true);
+		beforepo.save(beforeticket);
+		return ResponseEntity
+	            .ok("Technician can view and resolve issue");  
+	}
+	
+	public ResponseEntity<?> adminView() {
 		List<AfterTicketT> ticketList = afterepo.findAll();
 		if (ticketList.isEmpty()) {
 	        return ResponseEntity
@@ -110,5 +139,49 @@ public class ServiceTicket {
 	    return ResponseEntity
 	            .ok(ticketList);  
 	}
+	
+	public ResponseEntity<?> reportToClient(AfterTicketT afterticket) {
+		afterticket.setVisibleToClient(true);
+		afterepo.save(afterticket);
+		return ResponseEntity
+	            .ok("client can view the status");
+	}
+
+	public ResponseEntity<?> pendingIssues() {
+		List<BeforeTicketT> assignedticketslist = beforepo.findByassigned(true);
+		if (assignedticketslist.isEmpty()) {
+	        return ResponseEntity
+	                .status(HttpStatus.NOT_FOUND)
+	                .body("No tickets found");
+	    }
+	    
+	    return ResponseEntity
+	            .ok(assignedticketslist); 
+	}
+
+	public ResponseEntity<?> reportToAdmin(AfterTicketT afterticket) {
+		afterepo.save(afterticket);
+		
+		beforepo.deleteById(afterticket.getBeforeTicketId());
+		
+		 return ResponseEntity
+		            .status(HttpStatus.CREATED)
+		            .body("Reported to Admin Successfully");
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

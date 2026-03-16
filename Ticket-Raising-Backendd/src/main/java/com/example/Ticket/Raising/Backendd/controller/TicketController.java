@@ -1,6 +1,5 @@
 package com.example.Ticket.Raising.Backendd.controller;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ public class TicketController {
         return service.techregister(techrequest);
     }
     
-    @PostMapping("/login")
+    @PostMapping("/clientlogin")
     public ResponseEntity<?> login(@RequestBody ClientDTO clientrequest, HttpSession session) {
 
      return service.clientlogin(clientrequest, session);
@@ -46,9 +45,48 @@ public class TicketController {
     	return service.raiseTicket(beforeticket);
     }
     
+  
+    
+    @GetMapping("/viewstatusClient")
+    public ResponseEntity<?> clientViewStatus(){
+    	return service.clientViewStatus();
+    }
+    
+    @GetMapping("/getAllPendingIssuesAdmin")
+    public ResponseEntity<?> pendingIssuesAdmin(){
+    	return service.pendingIssuesAdmin();
+    	
+    }
+    
+    @PostMapping("/assigneIssuestoTechnician")
+    public ResponseEntity<?> issuedToTechnician(@RequestBody BeforeTicketT beforeticket){
+    	return service.issuedToTechnician(beforeticket);
+    }
+    
+    
     @GetMapping("/adminViewStatus")
-    public ResponseEntity<?> adminView(AfterTicketT afterticket){
-    	return service.adminView(afterticket);
+    public ResponseEntity<?> adminView(){
+    	return service.adminView();
+    	
+    }
+    
+    @PostMapping("/reportToClient")
+    public ResponseEntity<?> reportToClient(@RequestBody AfterTicketT afterticket){
+    	return service.reportToClient(afterticket);
+    	
+    }
+    
+    
+    @GetMapping("/pendingIssuesTechnician")
+    public ResponseEntity<?> pendingIssues(){
+    	return service.pendingIssues();
+    	
+    }
+    
+    
+    @PostMapping("/reportToAdmin")
+    public ResponseEntity<?> reportToAdmin(@RequestBody AfterTicketT afterticket){
+    	return service.reportToAdmin(afterticket);
     	
     }
     
