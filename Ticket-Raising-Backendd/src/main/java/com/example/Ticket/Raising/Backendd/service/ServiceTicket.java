@@ -180,14 +180,20 @@ public class ServiceTicket {
 	}
 
 	public ResponseEntity<?> reportToAdmin(AfterTicketT afterticket) {
-		afterepo.save(afterticket);
-//		save the updated status , solution and issueid(from frontend) issue,description fields to afterticket table
-		beforepo.deleteById(afterticket.getBeforeTicketId());
-//		delete the issues that are acknowledged by technician from before ticket table
-		
-		 return ResponseEntity
+		    
+		    afterepo.save(afterticket);
+//			save the updated status , solution and issueid(from frontend) issue,description fields to afterticket table
+
+		    if (afterticket.getStatus().equalsIgnoreCase("Resolved")) {
+		        beforepo.deleteById(afterticket.getBeforeTicketId());
+		    }//		delete the issues that are acknowledged by technician from before ticket table
+
+
+		    return ResponseEntity
 		            .status(HttpStatus.CREATED)
 		            .body("Reported to Admin Successfully");
+		}
+
 	}
 
 
@@ -205,4 +211,4 @@ public class ServiceTicket {
 
 
 
-}
+

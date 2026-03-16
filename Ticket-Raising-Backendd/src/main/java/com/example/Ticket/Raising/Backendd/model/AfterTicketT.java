@@ -18,7 +18,8 @@ public class AfterTicketT {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer issueid;
-	private Integer beforeTicketId;  // ✅ this links both tables
+	private Integer beforeTicketId;  // ✅ this links both tables,
+//	like when technician clicks the issue it will get issue details prefilled from beforeticket then this info is used to save in afterticket table  
 	private String issue;
 	private Date issudedate;
 	private String description;
