@@ -29,6 +29,8 @@ public class TicketController {
     public ResponseEntity<?> clientregister(@RequestBody  ClientDTO clientrequest) {
         return service.clientregister(clientrequest);
     }
+    
+    
     @PostMapping("/technicianregister")
     public ResponseEntity<?> techregister(@RequestBody  TechnicianDTO techrequest) {
         return service.techregister(techrequest);
@@ -40,25 +42,27 @@ public class TicketController {
      return service.clientlogin(clientrequest, session);
     }
     
-    @PostMapping("/RaiseTicket")
+//    client apis------------------------------------------
+    
+    @PostMapping("/RaiseTicket")    //raiseticket button
     public ResponseEntity<?> raiseticket(@RequestBody BeforeTicketT beforeticket){
     	return service.raiseTicket(beforeticket);
     }
     
   
     
-    @GetMapping("/viewstatusClient")
+    @GetMapping("/viewstatusClient")    //viewstatus button 
     public ResponseEntity<?> clientViewStatus(){
     	return service.clientViewStatus();
     }
+//    admin apis-------------
     
     @GetMapping("/getAllPendingIssuesAdmin")
     public ResponseEntity<?> pendingIssuesAdmin(){
     	return service.pendingIssuesAdmin();
-    	
     }
     
-    @PostMapping("/assigneIssuestoTechnician")
+    @PostMapping("/assigneIssuestoTechnician")  //assign button when admin clicks issue
     public ResponseEntity<?> issuedToTechnician(@RequestBody BeforeTicketT beforeticket){
     	return service.issuedToTechnician(beforeticket);
     }
@@ -70,12 +74,13 @@ public class TicketController {
     	
     }
     
-    @PostMapping("/reportToClient")
-    public ResponseEntity<?> reportToClient(@RequestBody AfterTicketT afterticket){
-    	return service.reportToClient(afterticket);
-    	
-    }
+//    @PostMapping("/reportToClient")
+//    public ResponseEntity<?> reportToClient(@RequestBody AfterTicketT afterticket){
+//    	return service.reportToClient(afterticket);
+//    	
+//    }
     
+//    technician apis-----
     
     @GetMapping("/pendingIssuesTechnician")
     public ResponseEntity<?> pendingIssues(){
