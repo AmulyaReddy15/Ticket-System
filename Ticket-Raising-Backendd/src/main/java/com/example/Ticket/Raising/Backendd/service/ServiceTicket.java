@@ -10,15 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.Ticket.Raising.Backendd.dto.ClientDTO;
-import com.example.Ticket.Raising.Backendd.dto.TechnicianDTO;
 import com.example.Ticket.Raising.Backendd.model.AfterTicketT;
 import com.example.Ticket.Raising.Backendd.model.BeforeTicketT;
 import com.example.Ticket.Raising.Backendd.model.ClientT;
-import com.example.Ticket.Raising.Backendd.model.TechnicianT;
 import com.example.Ticket.Raising.Backendd.repository.AfterRepo;
 import com.example.Ticket.Raising.Backendd.repository.BeforeRepo;
 import com.example.Ticket.Raising.Backendd.repository.ClientRepo;
-import com.example.Ticket.Raising.Backendd.repository.TechnicianRepo;
 
 
 import jakarta.servlet.http.HttpSession;
@@ -27,8 +24,6 @@ import jakarta.servlet.http.HttpSession;
 public class ServiceTicket {
 	@Autowired
 	private ClientRepo clientrepo;
-	@Autowired
-	private TechnicianRepo techrepo;
 	@Autowired
 	private BeforeRepo beforepo;
 	@Autowired
@@ -50,18 +45,6 @@ public class ServiceTicket {
 		
 		clientrepo.save(client);
 		
-		return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Registered Successfully");
-	}
-
-
-	public ResponseEntity<?> techregister(TechnicianDTO techrequest) {
-	   TechnicianT technician = new TechnicianT();
-	   technician.setName(techrequest.getName());
-	   technician.setEmail(techrequest.getEmail());
-	   technician.setPassword(techrequest.getPassword());
-	   
-	   techrepo.save(technician);
 		return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Registered Successfully");
 	}
@@ -93,8 +76,11 @@ public class ServiceTicket {
 	}
 
 //client ui apis--------------------------------------------------------------
-	public ResponseEntity<?> raiseTicket(BeforeTicketT beforeticket) {
-	
+	public ResponseEntity<?> raiseTicket(BeforeTicketT beforeticket, HttpSession session) {
+        ClientT client = (ClientT) session.getAttribute("client");
+        if (client == null) return ResponseEntity.ok("Session is EMPTY");
+        beforeticket.setClientid(client.getId());
+		//		ClientT client = (ClientT) session.getAttribute("client");)
 		beforepo.save(beforeticket);   //will store raised issues in beforeticket table
 		
 		return ResponseEntity
@@ -104,8 +90,11 @@ public class ServiceTicket {
 	
 	
 	
-	public ResponseEntity<?> clientViewStatus() {
-		List<AfterTicketT> ticketstatusList = afterepo.findAll();
+	public ResponseEntity<?> clientViewStatus(HttpSession session) {
+		
+		ClientT client = (ClientT) session.getAttribute("client");
+	    List<AfterTicketT> ticketstatusList = afterepo.findByClientid(client.getId());
+
 //		gets all the not resolved,resolved,inprogress issues details display
 		
 		if (ticketstatusList.isEmpty()) {
@@ -165,7 +154,7 @@ public class ServiceTicket {
 		
 		List<BeforeTicketT> assignedticketslist = beforepo.findByassigned(true);
 //		display assigned issues only 
-		List<AfterTicketT> remainingtickets = afterepo.findByStatus(List.of("Not resolved", "In progress"));
+		List<AfterTicketT> remainingtickets = afterepo.findByStatusIn(List.of("Not resolved", "In progress"));
 //		along with pending(not resolved and inprogress) issues
 		if (assignedticketslist.isEmpty() && remainingtickets.isEmpty()) {
 	        return ResponseEntity
@@ -180,7 +169,10 @@ public class ServiceTicket {
 	}
 
 	public ResponseEntity<?> reportToAdmin(AfterTicketT afterticket) {
-		    
+		// fetch original before ticket to get clientId
+	    BeforeTicketT before = beforepo.findById(afterticket.getBeforeTicketId())
+	                    .orElseThrow(() -> new RuntimeException("Ticket not found"));
+	    afterticket.setClientid(before.getClientid()); // carry over clientId
 		    afterepo.save(afterticket);
 //			save the updated status , solution and issueid(from frontend) issue,description fields to afterticket table
 

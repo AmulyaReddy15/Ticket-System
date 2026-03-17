@@ -2,6 +2,7 @@ package com.example.Ticket.Raising.Backendd.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Ticket.Raising.Backendd.dto.ClientDTO;
-import com.example.Ticket.Raising.Backendd.dto.TechnicianDTO;
 import com.example.Ticket.Raising.Backendd.model.AfterTicketT;
 import com.example.Ticket.Raising.Backendd.model.BeforeTicketT;
 import com.example.Ticket.Raising.Backendd.service.ServiceTicket;
@@ -24,17 +24,15 @@ public class TicketController {
 	
 	@Autowired
 	private ServiceTicket service;
-	
+//	{
+//	    "issue": "Laptop not working",
+//	    "description": "Screen goes blank randomly"
+//	}
     @PostMapping("/clientregister")
     public ResponseEntity<?> clientregister(@RequestBody  ClientDTO clientrequest) {
         return service.clientregister(clientrequest);
     }
     
-    
-    @PostMapping("/technicianregister")
-    public ResponseEntity<?> techregister(@RequestBody  TechnicianDTO techrequest) {
-        return service.techregister(techrequest);
-    }
     
     @PostMapping("/clientlogin")
     public ResponseEntity<?> login(@RequestBody ClientDTO clientrequest, HttpSession session) {
@@ -42,18 +40,26 @@ public class TicketController {
      return service.clientlogin(clientrequest, session);
     }
     
-//    client apis------------------------------------------
+ // in service
+    public ResponseEntity<?> technicianlogin(String password) {
+        if (password.equals("tech123")) {
+            return ResponseEntity.ok("Technician login successful");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+    }
     
+    
+//    client apis-------------------------------------
     @PostMapping("/RaiseTicket")    //raiseticket button
-    public ResponseEntity<?> raiseticket(@RequestBody BeforeTicketT beforeticket){
-    	return service.raiseTicket(beforeticket);
+    public ResponseEntity<?> raiseticket(@RequestBody BeforeTicketT beforeticket, HttpSession session){
+    	return service.raiseTicket(beforeticket,session);
     }
     
   
     
     @GetMapping("/viewstatusClient")    //viewstatus button 
-    public ResponseEntity<?> clientViewStatus(){
-    	return service.clientViewStatus();
+    public ResponseEntity<?> clientViewStatus( HttpSession session){
+    	return service.clientViewStatus(session);
     }
 //    admin apis-------------
     

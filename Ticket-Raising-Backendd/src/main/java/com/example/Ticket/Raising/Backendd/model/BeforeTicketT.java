@@ -21,6 +21,7 @@ public class BeforeTicketT {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer issueid;
+	private Integer clientid;
 	@CreationTimestamp
 	private LocalDateTime issueDate;
 	private String issue;
