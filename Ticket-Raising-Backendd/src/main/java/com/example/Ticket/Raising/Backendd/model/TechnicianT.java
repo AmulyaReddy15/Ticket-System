@@ -1,9 +1,5 @@
 package com.example.Ticket.Raising.Backendd.model;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,20 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor      
 @AllArgsConstructor     // through lambok
 @Entity
-public class BeforeTicketT {
-	
+public class TechnicianT {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer issueid;
-	private Integer clientid;
-	private Integer techid;
-	@CreationTimestamp
-	private LocalDateTime issueDate;
-	private String issue;
-	private String description;
+    private Integer techid;
+	private String name;
+	private String email;
+	private String password;
 	private String domain;
-	private String status = "pending";
-	private Boolean assigned = false; //  default 
 	
-
+	
 }

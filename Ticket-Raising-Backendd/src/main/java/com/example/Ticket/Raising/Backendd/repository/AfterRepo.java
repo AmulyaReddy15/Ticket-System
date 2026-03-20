@@ -10,6 +10,6 @@ import com.example.Ticket.Raising.Backendd.model.AfterTicketT;
 
 public interface AfterRepo extends JpaRepository<AfterTicketT, Integer> {
 
-	List<AfterTicketT> findByStatusIn(List<String> statuses); 
-	List<AfterTicketT> findByClientid(Integer clientid);
+	List<AfterTicketT> findByStatusInAndTechid(List<String> statuses,int techid); 
+	List<AfterTicketT> findByClientidAndClientView(Integer id, boolean clientView);
 }

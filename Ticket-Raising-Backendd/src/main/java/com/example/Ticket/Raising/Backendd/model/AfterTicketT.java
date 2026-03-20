@@ -1,6 +1,6 @@
 package com.example.Ticket.Raising.Backendd.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,9 +22,12 @@ public class AfterTicketT {
 	private Integer beforeTicketId;  // ✅ this links both tables,
 //	like when technician clicks the issue it will get issue details prefilled from beforeticket then this info is used to save in afterticket table  
 	private String issue;
-	private Date issudedate;
+	private LocalDateTime issudedate;
 	private String description;
+	private String domain;
+	private Integer techid;
 	private String status;
 	private String solution;
+	private Boolean clientView = false; // default
 
 }
