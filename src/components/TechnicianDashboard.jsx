@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import axios from 'axios';
+const API = import.meta.env.VITE_API_URL;
+
 
 const TechnicianDashboard = () => {
 
@@ -7,42 +10,86 @@ const TechnicianDashboard = () => {
   const [solution, setSolution] = useState("");
   const [status, setStatus] = useState("");
 
-  const [tickets] = useState([
-    {
-      issue: "Login Problem",
-      description: "User cannot login to account",
-      date: "19/03/2026",
-      domain: "Software and Application Support",
-      status: "Not Resolved"
-    },
-    {
-      issue: "Printer Not Working",
-      description: "Printer not responding",
-      date: "18/03/2026",
-      domain: "Hardware Support",
-      status: "Not Resolved"
+//  REPLACE const [tickets] = useState([...]) with two separate states:
+  const [assignedTickets, setAssignedTickets] = useState([]);  // newly assigned by admin
+  const [pendingTickets, setPendingTickets] = useState([]);    // not resolved + in progress
+
+
+  //  FUNCTION 1 — load both assigned and pending tickets
+  const fetchIssues = async () => {
+    try {
+      const res = await axios.get(
+        `${API}/pendingIssuesTechnician`,
+        { withCredentials: true }
+      );
+      //  backend returns { assignedTickets: [...], pendingTickets: [...] }
+      setAssignedTickets(res.data.assignedTickets);
+      setPendingTickets(res.data.pendingTickets);
+      setShowIssues(true);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setAssignedTickets([]);
+        setPendingTickets([]);
+        setShowIssues(true);
+      } else if (error.response?.status === 401) {
+        alert("Please login first");
+      }
     }
-  ]);
-
-
-  const reportToAdmin = () => {
-
-    if(solution.trim() === ""){
+  };
+  //  FUNCTION 2 — report solution + status to admin
+  const reportToAdmin = async () => {
+    if (solution.trim() === "") {
       alert("Please enter solution");
       return;
     }
-
-    if(status === ""){
+    if (status === "") {
       alert("Please select status");
       return;
     }
-
-    alert("Issue Updated and Reported to Admin");
-
-    setSelectedTicket(null);
-    setSolution("");
-    setStatus("");
+    try {
+      await axios.post(
+        `${API}/reportToAdmin`,
+        {
+          beforeTicketId: selectedTicket.issueid, //  links BeforeTicketT to AfterTicketT
+          status: status,                          //  AfterTicketT → private String status
+          solution: solution,                      //  AfterTicketT → private String solution
+          // clientid, issue, description, domain, techid
+          // are all set by backend from session + BeforeTicketT automatically ✅
+        },
+        { withCredentials: true }
+      );
+      alert("Reported to Admin Successfully!");
+      setSelectedTicket(null);
+      setSolution("");
+      setStatus("");
+      fetchIssues();  //  refresh list after reporting
+    } catch (error) {
+      if (error.response?.status === 401) {
+        alert("Please login first");
+      } else {
+        alert("Failed to report: " + error.response?.data);
+      }
+    }
   };
+
+  // const reportToAdmin = () => {
+
+  //   if(solution.trim() === ""){
+  //     alert("Please enter solution");
+  //     return;
+  //   }
+
+  //   if(status === ""){
+  //     alert("Please select status");
+  //     return;
+  //   }
+
+  //   alert("Issue Updated and Reported to Admin");
+
+  //   setSelectedTicket(null);
+  //   setSolution("");
+  //   setStatus("");
+  // };
 
 
   return (
@@ -52,7 +99,7 @@ const TechnicianDashboard = () => {
 
       <button
         className="dashboard-btn"
-        onClick={()=>setShowIssues(true)}
+        onClick={fetchIssues} 
       >
         View Issues to be Resolved
       </button>
@@ -63,36 +110,52 @@ const TechnicianDashboard = () => {
 {showIssues && (
 
 <div className="tech-popup-overlay">
-
 <div className="tech-popup">
-
 <h3>Assigned Issues</h3>
 
-{tickets.map((ticket,index)=>(
+{/*  SECTION 1 — newly assigned by admin (from BeforeTicketT) */}
+      {assignedTickets.length === 0 && <p>No new assigned issues</p>}
+{assignedTickets.map((ticket,index)=>(
 
 <div
 key={index}
 className="issue-row"
 onClick={()=>{
   setSelectedTicket(ticket)
-  setStatus(ticket.status)
+  setStatus("")
 }}
 >
 
 <p><b>Issue:</b> {ticket.issue}</p>
 
-<p><b>Issue Date:</b> {ticket.date}</p>
+<p><b>Issue Date:</b>  {new Date(ticket.issueDate).toLocaleDateString()}</p>
 
 <p><b>Description:</b> {ticket.description}</p>
 
 </div>
 
 ))}
+     {/*  SECTION 2 — in progress / not resolved (from AfterTicketT) */}
+      <h3 style={{marginTop:"15px"}}>In Progress / Not Resolved</h3>
+      {pendingTickets.length === 0 && <p>No pending issues</p>}
+      {pendingTickets.map((ticket, index) => (
+        <div
+          key={index}
+          className="issue-row"
+          onClick={() => {
+            setSelectedTicket(ticket);
+            setStatus(ticket.status);
+          }}
+        >
+          <p><b>Issue:</b> {ticket.issue}</p>
+          <p><b>Date:</b> {new Date(ticket.issudedate).toLocaleDateString()}</p>  {/*  issudedate from AfterTicketT */}
+          <p><b>Description:</b> {ticket.description}</p>
+        </div>
+      ))}
 
 <button
 className="close-popup"
-onClick={()=>setShowIssues(false)}
->
+onClick={()=>setShowIssues(false)}>
 Close
 </button>
 
@@ -116,7 +179,10 @@ Close
 
 <p><b>Issue:</b> {selectedTicket.issue}</p>
 
-<p><b>Issue Date:</b> {selectedTicket.date}</p>
+      {/* 🔌 date field differs between BeforeTicketT and AfterTicketT */}
+      <p><b>Date:</b> {new Date(
+        selectedTicket.issueDate || selectedTicket.issudedate  // 🔌 handles both tables
+      ).toLocaleDateString()}</p>
 
 <p><b>Description:</b> {selectedTicket.description}</p>
 

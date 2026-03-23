@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState  } from "react";
+import axios from 'axios';
+const API = import.meta.env.VITE_API_URL;
+
 
 const ClientDashboard = () => {
 
@@ -11,28 +14,59 @@ const ClientDashboard = () => {
   const [description, setDescription] = useState("");
   const [domain, setDomain] = useState("");
 
-  const submitTicket = () => {
+// view tikets function
+const fetchTickets = async () => {
+  try {
+    const res = await axios.get(
+      `${API}/viewstatusClient`,
+      { withCredentials: true }
+    );
+    setTickets(res.data);
+    setShowTickets(true);
+  } catch (error) {
+    if (error.response?.status === 401) {
+      alert("Please login first");
+    } else if (error.response?.status === 404) {
+      setTickets([]);       // no tickets yet — shows "No Tickets Raised"
+      setShowTickets(true);
+    }
+  }
+};
+
+
+  const raiseTicket = async () => {
 
     if(!issue || !description || !domain){
       alert("Please fill all fields");
       return;
     }
 
-    const newTicket = {
-      issue: issue,
-      description: description,
-      domain: domain,
-      date: new Date().toLocaleDateString(),
-      status: "Not Resolved"
-    };
-
-    setTickets([...tickets, newTicket]);
-
+try {
+    await axios.post(
+      `${API}/RaiseTicket`,
+      {
+        issue: issue,              //  matches BeforeTicketT → private String issue
+        description: description,  //  matches BeforeTicketT → private String description
+        domain: domain             //  matches BeforeTicketT → private String domain
+        // clientid is set by backend from session automatically 
+        // issueDate is set by @CreationTimestamp automatically 
+        // status defaults to "pending" automatically 
+        // assigned defaults to false automatically 
+      },
+      { withCredentials: true }    //  CRITICAL — sends session so backend knows which client
+    );
+    alert("Ticket Raised Successfully!");
     setIssue("");
     setDescription("");
     setDomain("");
-
     setShowPopup(false);
+  } catch (error) {
+    if (error.response?.status === 401) {
+      alert("Please login first");
+    } else {
+      alert("Failed to raise ticket: " + (error.response?.data?.message || JSON.stringify(error.response?.data)));
+    }
+  }
   };
 
   return (
@@ -49,11 +83,12 @@ const ClientDashboard = () => {
           Raise New Ticket
         </button>
 
-        <button onClick={()=>{
-          setShowTickets(true)
-        }}>
-          View Tickets
-        </button>
+<button onClick={() => {
+  fetchTickets();
+  setShowPopup(false);
+}}>
+  View Tickets
+</button>
 
       </div>
 
@@ -95,7 +130,7 @@ const ClientDashboard = () => {
 
       <div className="raise-ticket-buttons">
 
-        <button className="raise-send" onClick={submitTicket}>
+        <button className="raise-send" onClick={raiseTicket}>
           Raise
         </button>
 
@@ -131,7 +166,7 @@ const ClientDashboard = () => {
 
               <p><b>Domain:</b> {ticket.domain}</p>
 
-              <p><b>Date:</b> {ticket.date}</p>
+              <p><b>Date:</b> {ticket.issudedate}</p>
 
               <p>
                 <b>Status:</b> {ticket.status}

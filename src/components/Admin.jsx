@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 const API = import.meta.env.VITE_API_URL;
@@ -8,9 +8,22 @@ const Admin = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  //  ADD states
+const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
+
+  const handleLogin = async (e) => {
     e.preventDefault();   // prevents page reload
+   try {
+    await axios.post(
+      `${API}/adminlogin?username=${username}&password=${password}`,
+      {},                          //  empty body — params are in URL because @RequestParam
+      { withCredentials: true }
+    );
     navigate("/admin-dashboard");
+  } catch (error) {
+    alert("Invalid credentials");
+  }
   };
 
   return (
@@ -22,16 +35,19 @@ const Admin = () => {
         <h2>Admin Login</h2>
 
         <input
-          type="text"
-          placeholder="Admin ID / Email"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          required
-        />
+  type="text"
+  placeholder="Admin Username"
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}  //  ADD
+  required
+/>
+<input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}  //  ADD
+  required
+/>
 
         <button type="submit">
           Login
