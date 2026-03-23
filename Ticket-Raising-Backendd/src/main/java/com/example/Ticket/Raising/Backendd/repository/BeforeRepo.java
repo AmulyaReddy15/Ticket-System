@@ -14,4 +14,6 @@ public interface BeforeRepo extends JpaRepository<BeforeTicketT, Integer>{
 
 	List<BeforeTicketT> findByassignedAndTechid(boolean assigned,int techid);
 
+	List<BeforeTicketT> findByClientid(Integer id);
+
 }

@@ -1,5 +1,6 @@
 package com.example.Ticket.Raising.Backendd.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +99,7 @@ public class ServiceClient {
 			            .body("Please login first");
 			}
 		    List<AfterTicketT> ticketstatusList = afterepo.findByClientidAndClientView(client.getId(),true);
+		    List<BeforeTicketT> remainingtickets = beforepo.findByClientid(client.getId());
 
 //			gets all the not resolved,resolved,inprogress issues details display
 			
@@ -106,9 +108,14 @@ public class ServiceClient {
 		                .status(HttpStatus.NOT_FOUND)
 		                .body("No tickets found");
 		    }
-		    
+		    // ✅ Combine both
+		    List<Object> allTickets = new ArrayList<>();
+
+		    allTickets.addAll(ticketstatusList);
+		    allTickets.addAll(remainingtickets);
+		  
 		    return ResponseEntity
-		            .ok(ticketstatusList); 
+		            .ok(allTickets); 
 		}
 
 }

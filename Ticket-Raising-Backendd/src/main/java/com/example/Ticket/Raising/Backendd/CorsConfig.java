@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration  // 🔌 tells Spring this is a config class
+@Configuration  //  tells Spring this is a config class
 public class CorsConfig {
 
     @Bean
@@ -14,11 +14,11 @@ public class CorsConfig {
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")          // 🔌 applies to all /api/ routes
-                    .allowedOrigins("http://localhost:5173")  // 🔌 your React Vite port
-                    .allowedMethods("GET", "POST", "PUT", "DELETE")  // 🔌 methods you use
+                registry.addMapping("/api/**")
+                    .allowedOriginPatterns("http://localhost:5173", "http://localhost:5174")  // 🔌 CHANGE allowedOrigins to allowedOriginPatterns
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // 🔌 ADD OPTIONS
                     .allowedHeaders("*")
-                    .allowCredentials(true);  // 🔌 needed for JWT token in headers
+                    .allowCredentials(true);  // this only works with allowedOriginPatterns not allowedOrigins
             }
         };
     }
