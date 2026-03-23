@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from 'axios';
+const API = import.meta.env.VITE_API_URL;
 const Register = () => {
 
   const navigate = useNavigate();
@@ -8,6 +9,15 @@ const Register = () => {
   const [showPopup, setShowPopup] = useState(true);
   const [role, setRole] = useState("");
   const [domain, setDomain] = useState("");
+
+    //  matches ClientDTO fields exactly
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  //  technician has one extra field: domain
+const [techName, setTechName] = useState("");
+const [techEmail, setTechEmail] = useState("");
+const [techPassword, setTechPassword] = useState("");
 
   useEffect(() => {
     setShowPopup(true);
@@ -24,13 +34,23 @@ const Register = () => {
   };
 
   /* Client Register */
-  const handleClientRegister = (e) => {
+  const handleClientRegister = async (e) => {
     e.preventDefault();
-    navigate("/login", { state: { role: "client" } });
+    try {
+      await axios.post(`${API}/clientregister`, {
+        name: name,        // 🔌 matches ClientDTO → private String name
+        email: email,      // 🔌 matches ClientDTO → private String email
+        password: password // 🔌 matches ClientDTO → private String password
+      });
+      alert("Registered Successfully!");
+      navigate("/login", { state: { role: "client" } });
+    } catch (error) {
+      alert("Registration failed: " + error.response?.data);
+    }
   };
 
   /* Technician Register */
-  const handleTechRegister = (e) => {
+  const handleTechRegister = async (e) => {
 
     e.preventDefault();
 
@@ -39,7 +59,18 @@ const Register = () => {
       return;
     }
 
+      try {
+    await axios.post(`${API}/techncicianRegister`, {
+      name: techName,        // 🔌 matches TechnicianDTO → private String name
+      email: techEmail,      // 🔌 matches TechnicianDTO → private String email
+      password: techPassword,// 🔌 matches TechnicianDTO → private String password
+      domain: domain         // 🔌 matches TechnicianDTO → private String domain
+    });
+    alert("Technician Registered Successfully!");
     navigate("/login", { state: { role: "technician" } });
+  } catch (error) {
+    alert("Registration failed: " + error.response?.data);
+  }
 
   };
 
@@ -77,27 +108,33 @@ const Register = () => {
 
           <input
             type="text"
-            placeholder="Client ID"
+            placeholder="Client name"
+            value={name}                  // 🔌 ADD
+            onChange={(e) => setName(e.target.value)}  // 🔌 ADD
             required
           />
 
           <input
             type="email"
-            placeholder="Client Email"
+            placeholder=" Email"
+            value={email}                 // 🔌 ADD
+            onChange={(e) => setEmail(e.target.value)}  // 🔌 ADD
             required
           />
 
           <input
             type="password"
-            placeholder="Client Password"
+            placeholder=" Password"
+            value={password}              // 🔌 ADD
+            onChange={(e) => setPassword(e.target.value)} 
             required
           />
 
-          <input
+          {/* <input
             type="password"
             placeholder="Confirm Password"
             required
-          />
+          /> */}
 
           <button type="submit">
             Register
@@ -112,29 +149,31 @@ const Register = () => {
 
           <h2>Technician Registration</h2>
 
-          <input
-            type="text"
-            placeholder="Technician ID"
-            required
-          />
+  <input
+  type="text"
+  placeholder="Name"       //  CHANGE from "Technician ID"
+  value={techName}                     //  ADD
+  onChange={(e) => setTechName(e.target.value)}  //  ADD
+  required
+/>
 
-          <input
-            type="email"
-            placeholder="Technician Email"
-            required
-          />
+<input
+  type="email"
+  placeholder=" Email"
+  value={techEmail}                    //  ADD
+  onChange={(e) => setTechEmail(e.target.value)}  //  ADD
+  required
+/>
 
-          <input
-            type="password"
-            placeholder="Technician Password"
-            required
-          />
+<input
+  type="password"
+  placeholder=" Password"
+  value={techPassword}                 // ADD
+  onChange={(e) => setTechPassword(e.target.value)}  //  ADD
+  required
+/>
 
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            required
-          />
+{/* domain select already has value={domain} and onChange — keep as is ✅ */}
 
           <select
             value={domain}
