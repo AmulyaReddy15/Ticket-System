@@ -14,6 +14,20 @@ const AdminDashboard = () => {
   const [pendingTickets, setPendingTickets] = useState([]);  // from BeforeTicketT
   const [statusTickets, setStatusTickets] = useState([]);    // from AfterTicketT
 
+  // function for logout 
+const logout = async () =>{
+  try{
+  const res = await axios.post(
+      `${API}/adminlogout`,
+      {},
+      { withCredentials: true },
+    );
+    navigate("/");
+  }catch (error) {
+      console.error("Logout error:", error);
+    } 
+
+};
     //  FUNCTION 1 — load pending issues (BeforeTicketT list)
   const fetchPendingIssues = async () => {
     try {
@@ -97,6 +111,7 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
 
       <h2 className="admin-h2">Admin Dashboard</h2>
+      <button className="logout-btn" onClick={logout}>Logout</button>
 
       <div className="admin-buttons">
 

@@ -1,7 +1,10 @@
 import React, { useState  } from "react";
 import axios from 'axios';
 const API = import.meta.env.VITE_API_URL;
+import { useNavigate } from 'react-router-dom';  
 
+
+const navigate = useNavigate();  
 
 const ClientDashboard = () => {
 
@@ -32,7 +35,20 @@ const fetchTickets = async () => {
     }
   }
 };
+// function for logout 
+const logout = async () =>{
+  try{
+  const res = await axios.post(
+      `${API}/clientlogout`,
+      {},
+      { withCredentials: true },
+    );
+    navigate("/");
+  }catch (error) {
+      console.error("Logout error:", error);
+    } 
 
+};
 
   const raiseTicket = async () => {
 
@@ -73,6 +89,10 @@ try {
     <div className="dashboard">
 
       <h2>Client Dashboard</h2>
+
+         <button className="logout-btn" onClick={logout}>
+          Logout
+        </button>
 
       <div className="dashboard-buttons">
 

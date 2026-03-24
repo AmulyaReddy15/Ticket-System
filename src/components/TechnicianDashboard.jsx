@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import axios from 'axios';
 const API = import.meta.env.VITE_API_URL;
-
+import { useNavigate } from 'react-router-dom'; 
+import './TechnicianDashboard.css';
 
 const TechnicianDashboard = () => {
-
+ const navigate = useNavigate();
   const [showIssues, setShowIssues] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [solution, setSolution] = useState("");
@@ -14,7 +15,20 @@ const TechnicianDashboard = () => {
   const [assignedTickets, setAssignedTickets] = useState([]);  // newly assigned by admin
   const [pendingTickets, setPendingTickets] = useState([]);    // not resolved + in progress
 
+  // function for logout 
+const logout = async () =>{
+  try{
+  const res = await axios.post(
+      `${API}/techncicianlogout`,
+      {},
+      { withCredentials: true },
+    );
+    navigate("/");
+  }catch (error) {
+      console.error("Logout error:", error);
+    } 
 
+};
   //  FUNCTION 1 — load both assigned and pending tickets
   const fetchIssues = async () => {
     try {
@@ -96,6 +110,7 @@ const TechnicianDashboard = () => {
     <div className="dashboard">
 
       <h2>Technician Dashboard</h2>
+      <button onClick={() => { setShowPopup(true); setShowTickets(false); }}></button>
 
       <button
         className="dashboard-btn"
