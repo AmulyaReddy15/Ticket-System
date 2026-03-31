@@ -24,7 +24,7 @@ public class BeforeTicketT {
 	private Integer clientid;
 	private Integer techid;
 	@CreationTimestamp
-	private LocalDateTime issueDate;
+	private LocalDateTime issudedate;
 	private String issue;
 	private String description;
 	private String domain;

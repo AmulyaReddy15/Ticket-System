@@ -80,6 +80,9 @@ public class ServiceClient {
 	            .body("Please login first");
 	        }
 	        beforeticket.setClientid(client.getId());
+	        if (beforeticket.getStatus() == null) {
+	            beforeticket.setStatus("Pending");
+	        }
 			//		ClientT client = (ClientT) session.getAttribute("client");)
 			beforepo.save(beforeticket);   //will store raised issues in beforeticket table
 			
@@ -102,17 +105,17 @@ public class ServiceClient {
 		    List<BeforeTicketT> remainingtickets = beforepo.findByClientid(client.getId());
 
 //			gets all the not resolved,resolved,inprogress issues details display
-			
-			if (ticketstatusList.isEmpty()) {
-		        return ResponseEntity
-		                .status(HttpStatus.NOT_FOUND)
-		                .body("No tickets found");
-		    }
 		    // ✅ Combine both
 		    List<Object> allTickets = new ArrayList<>();
 
 		    allTickets.addAll(ticketstatusList);
 		    allTickets.addAll(remainingtickets);
+			
+			if (allTickets.isEmpty()) {
+		        return ResponseEntity
+		                .status(HttpStatus.NOT_FOUND)
+		                .body("No tickets found");
+		    }
 		  
 		    return ResponseEntity
 		            .ok(allTickets); 

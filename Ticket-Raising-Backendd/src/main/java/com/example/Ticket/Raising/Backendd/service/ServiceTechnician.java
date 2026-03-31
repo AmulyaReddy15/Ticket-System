@@ -84,7 +84,7 @@ public class ServiceTechnician {
 		}
 		List<BeforeTicketT> assignedticketslist = beforepo.findByassignedAndTechid(true,technician.getTechid());
 //		display assigned issues only 
-		List<AfterTicketT> remainingtickets = afterepo.findByStatusInAndTechid(List.of("Not resolved", "In progress"),technician.getTechid());
+		List<AfterTicketT> remainingtickets = afterepo.findByStatusInAndTechid(List.of("Not Resolved", "In Progress"),technician.getTechid());
 //		along with pending(not resolved and inprogress) issues
 		if (assignedticketslist.isEmpty() && remainingtickets.isEmpty()) {
 	        return ResponseEntity
@@ -106,7 +106,19 @@ public class ServiceTechnician {
 	                .status(HttpStatus.UNAUTHORIZED)
 	                .body("Technician not logged in");
 	    }
-	    
+	 //  Try to get existing AfterTicket
+	    AfterTicketT existing = afterepo.findById(afterticket.getIssueid()).orElse(null);
+
+	    if (existing != null) {
+	        // ✅ Ticket already in After table → just update
+	        existing.setStatus(afterticket.getStatus());
+	        existing.setSolution(afterticket.getSolution()); // if you have
+
+	        afterepo.save(existing);
+
+	        return ResponseEntity.ok("Updated Successfully");
+	    }
+
 	    // fetch original before ticket
 	    BeforeTicketT before = beforepo.findById(afterticket.getBeforeTicketId())
 //	    		when frontend sends beforeTicketId: 5, Spring maps it into afterticket.beforeTicketId = 5 and then your backend uses that id to fetch from BeforeTicket table.
@@ -116,7 +128,7 @@ public class ServiceTechnician {
 	    afterticket.setClientid(before.getClientid());
 	    afterticket.setIssue(before.getIssue());
 	    afterticket.setDescription(before.getDescription());
-	    afterticket.setIssudedate(before.getIssueDate());
+	    afterticket.setIssudedate(before.getIssudedate());
 	    		
 	    
 	    // carry over from session
@@ -126,7 +138,7 @@ public class ServiceTechnician {
 	    // status and solution come from frontend as it is
 	    afterepo.save(afterticket);
 
-	    if (afterticket.getStatus().equalsIgnoreCase("Resolved")) {
+	    if (afterticket.getStatus().equalsIgnoreCase("in progress")||afterticket.getStatus().equalsIgnoreCase("not resolved") || afterticket.getStatus().equalsIgnoreCase("Resolved")) {
 	        beforepo.deleteById(afterticket.getBeforeTicketId());
 	    }
 
@@ -134,33 +146,6 @@ public class ServiceTechnician {
 	            .status(HttpStatus.CREATED)
 	            .body("Reported to Admin Successfully");
 	}
-
-//	public ResponseEntity<?> reportToAdmin(AfterTicketT afterticket,HttpSession session) {
-//		
-//		TechnicianT technician = (TechnicianT) session.getAttribute("technician");
-//		if (technician == null) {
-//		    return ResponseEntity
-//		            .status(HttpStatus.UNAUTHORIZED)
-//		            .body("Technician not logged in");
-//		}
-//		// fetch original before ticket to get clientId
-//	    BeforeTicketT before = beforepo.findById(afterticket.getBeforeTicketId())
-//	                    .orElseThrow(() -> new RuntimeException("Ticket not found"));
-//	    afterticket.setClientid(before.getClientid()); // carry over clientId
-//		afterticket.setTechid(technician.getTechid());  
-//		afterticket.setDomain(technician.getDomain());
-//	    afterepo.save(afterticket);
-////			save the updated status , solution and issueid(from frontend) issue,description fields to afterticket table
-//
-//		    if (afterticket.getStatus().equalsIgnoreCase("Resolved")) {
-//		        beforepo.deleteById(afterticket.getBeforeTicketId());
-//		    }//		delete the issues that are acknowledged by technician from before ticket table
-//
-//
-//		    return ResponseEntity
-//		            .status(HttpStatus.CREATED)
-//		            .body("Reported to Admin Successfully");
-//		}
 
 
 
