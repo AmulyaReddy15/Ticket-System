@@ -64,7 +64,8 @@ const logout = async () =>{
       await axios.post(
         `${API}/reportToAdmin`,
         {
-          beforeTicketId: selectedTicket.issueid, //  links BeforeTicketT to AfterTicketT
+          issueid: selectedTicket.issueid,              // ✅ for update
+    beforeTicketId: selectedTicket.beforeTicketId, // ✅ for first time
           status: status,                          //  AfterTicketT → private String status
           solution: solution,                      //  AfterTicketT → private String solution
           // clientid, issue, description, domain, techid
@@ -86,31 +87,17 @@ const logout = async () =>{
     }
   };
 
-  // const reportToAdmin = () => {
 
-  //   if(solution.trim() === ""){
-  //     alert("Please enter solution");
-  //     return;
-  //   }
 
-  //   if(status === ""){
-  //     alert("Please select status");
-  //     return;
-  //   }
-
-  //   alert("Issue Updated and Reported to Admin");
-
-  //   setSelectedTicket(null);
-  //   setSolution("");
-  //   setStatus("");
-  // };
 
 
   return (
     <div className="dashboard">
 
-      <h2>Technician Dashboard</h2>
-      <button onClick={() => { setShowPopup(true); setShowTickets(false); }}></button>
+       <div className="tech-header">
+    <h2>Technician Dashboard</h2>
+    <button className="logout-btn" onClick={logout}>Logout</button>
+  </div>
 
       <button
         className="dashboard-btn"
@@ -151,7 +138,7 @@ onClick={()=>{
 
 ))}
      {/*  SECTION 2 — in progress / not resolved (from AfterTicketT) */}
-      <h3 style={{marginTop:"15px"}}>In Progress / Not Resolved</h3>
+      {/* <h3 style={{marginTop:"15px"}}>In Progress / Not Resolved</h3> */}
       {pendingTickets.length === 0 && <p>No pending issues</p>}
       {pendingTickets.map((ticket, index) => (
         <div

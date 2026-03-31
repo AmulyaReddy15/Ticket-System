@@ -2,11 +2,11 @@ import React, { useState  } from "react";
 import axios from 'axios';
 const API = import.meta.env.VITE_API_URL;
 import { useNavigate } from 'react-router-dom';  
-
-
-const navigate = useNavigate();  
+import  './ClientDashboard.css';
+ 
 
 const ClientDashboard = () => {
+  const navigate = useNavigate(); 
 
   const [showPopup, setShowPopup] = useState(false);
   const [showTickets, setShowTickets] = useState(false);
@@ -88,11 +88,10 @@ try {
   return (
     <div className="dashboard">
 
-      <h2>Client Dashboard</h2>
-
-         <button className="logout-btn" onClick={logout}>
-          Logout
-        </button>
+  <div className="dashboard-header">
+    <h2>Client Dashboard</h2>
+    <button className="logout-btn" onClick={logout}>Logout</button>
+  </div>
 
       <div className="dashboard-buttons">
 
@@ -186,7 +185,9 @@ try {
 
               <p><b>Domain:</b> {ticket.domain}</p>
 
-              <p><b>Date:</b> {ticket.issudedate}</p>
+              {/* <p><b>Date:</b> {ticket.issudedate}</p> */}
+             <p><b>Date:</b>{" "}
+  {ticket.issudedate && new Date(ticket.issudedate).toLocaleDateString()}</p>
 
               <p>
                 <b>Status:</b> {ticket.status}

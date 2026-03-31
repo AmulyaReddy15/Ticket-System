@@ -1,10 +1,12 @@
 import React, { useState , useEffect} from "react";
 import axios from 'axios';
 const API = import.meta.env.VITE_API_URL;
-
+import './AdminDashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
 
   const [showPending, setShowPending] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
@@ -110,8 +112,10 @@ const logout = async () =>{
 
     <div className="admin-dashboard">
 
-      <h2 className="admin-h2">Admin Dashboard</h2>
-      <button className="logout-btn" onClick={logout}>Logout</button>
+        <div className="dashboard-header">
+    <h2>Client Dashboard</h2>
+    <button className="logout-btn" onClick={logout}>Logout</button>
+  </div>
 
       <div className="admin-buttons">
 
@@ -152,7 +156,8 @@ onClick={()=>setSelectedTicket(t)}
 >
 
 <p><b>Issue:</b> {t.issue}</p>
-<p><b>Date:</b>  {new Date(t.issueDate).toLocaleDateString()}</p>
+<p><b>Date:</b>{" "}
+  {t.issudedate && new Date(t.issudedate).toLocaleDateString()}</p>
 <p><b>Domain:</b> {t.domain}</p>
 
 </div>
@@ -186,7 +191,10 @@ onClick={()=>setSelectedTicket(null)}
 
 <p><b>Issue:</b> {selectedTicket.issue}</p>
 <p><b>Description:</b> {selectedTicket.description}</p>
-<p><b>Date:</b>{new Date(selectedTicket.issueDate).toLocaleDateString()}</p>
+             <p>
+  <b>Date:</b>{" "}
+  {selectedTicket.issudedate && new Date(selectedTicket.issudedate).toLocaleDateString()}
+</p>
 <p><b>Domain:</b> {selectedTicket.domain}</p>
 <p><b>Status:</b> {selectedTicket.status}</p>
 
@@ -262,7 +270,7 @@ onClick={()=>setSelectedTicket(null)}
 
 <p><b>Issue:</b> {selectedTicket.issue}</p>
 <p><b>Description:</b> {selectedTicket.description}</p>
-<p><b>Date:</b> {new Date(selectedTicket.issueDate).toLocaleDateString()}</p>
+<p><b>Date:</b> {new Date(selectedTicket.issudedate).toLocaleDateString()}</p>
 <p><b>Domain:</b> {selectedTicket.domain}</p>
 <p><b>Status:</b> {selectedTicket.status}</p>
 
