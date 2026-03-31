@@ -107,7 +107,11 @@ public class ServiceTechnician {
 	                .body("Technician not logged in");
 	    }
 	 //  Try to get existing AfterTicket
-	    AfterTicketT existing = afterepo.findById(afterticket.getIssueid()).orElse(null);
+	 // ✅ Only check existing if issueid is present (update case)
+	    AfterTicketT existing = null;
+	    if (afterticket.getIssueid() != null) {
+	        existing = afterepo.findById(afterticket.getIssueid()).orElse(null);
+	    }
 
 	    if (existing != null) {
 	        // ✅ Ticket already in After table → just update

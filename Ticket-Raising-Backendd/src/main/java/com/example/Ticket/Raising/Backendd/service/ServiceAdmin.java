@@ -64,7 +64,35 @@ public class ServiceAdmin {
 			            .ok(pendingticketslist);
 			}
 			
-			public ResponseEntity<?> issuedToTechnician(Integer issueid,HttpSession session) {
+			
+			public ResponseEntity<?> avialableTechnician(Integer issueid,HttpSession session) {
+				String admin = (String) session.getAttribute("admin");
+				if (admin == null) {
+				    return ResponseEntity
+				            .status(HttpStatus.UNAUTHORIZED)
+				            .body("Admin not logged in");
+				}
+				 Optional<BeforeTicketT> beforeticket = beforepo.findById(issueid);
+					if(beforeticket.isEmpty()) {
+						return ResponseEntity
+				                .status(HttpStatus.NOT_FOUND)
+				                .body("No tickets found");
+					}
+					BeforeTicketT ticket = beforeticket.get();
+				List<TechnicianT> availableTechnicians = techrepo.findByDomain(ticket.getDomain());
+				
+				 if (availableTechnicians.isEmpty()) {
+				        return ResponseEntity
+				                .status(HttpStatus.NOT_FOUND)
+				                .body("No technicians available for this domain");
+				    }
+
+				    return ResponseEntity.ok(availableTechnicians);
+			}
+			
+			
+			
+			public ResponseEntity<?> issuedToTechnician(Integer issueid,Integer techid, HttpSession session) {
 				String admin = (String) session.getAttribute("admin");
 				if (admin == null) {
 				    return ResponseEntity
@@ -77,17 +105,21 @@ public class ServiceAdmin {
 			                .status(HttpStatus.NOT_FOUND)
 			                .body("No tickets found");
 				}
-				BeforeTicketT ticket = beforeticket.get();
-		        List<TechnicianT> technicians = techrepo.findByDomain(ticket.getDomain());		
-		        if(technicians.isEmpty()) {
+				
+		        Optional<TechnicianT> technician = techrepo.findById(techid);		
+		        if(technician.isEmpty()) {
 		        	return ResponseEntity
 			                .status(HttpStatus.NOT_FOUND)
 			                .body("No technician available for this domain");
 		        }
-		        TechnicianT techperson = technicians.get(0);
+		        BeforeTicketT ticket = beforeticket.get();
+		        TechnicianT tech = technician.get();
+		        
 				ticket.setAssigned(true);
-				ticket.setTechid(techperson.getTechid());
+				ticket.setTechid(tech.getTechid());
 				beforepo.save(ticket);  //button to assign particular issues to technician accordingly 
+				
+				
 				return ResponseEntity
 			            .ok("Technician can view and resolve issue");  
 			}
@@ -126,6 +158,7 @@ public class ServiceAdmin {
 				return ResponseEntity
 			            .ok("client can view the status");
 			}
+
 			
 
 }

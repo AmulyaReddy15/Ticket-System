@@ -41,9 +41,15 @@ public ResponseEntity<?> pendingIssuesAdmin(HttpSession session){
 	return service.pendingIssuesAdmin(session);
 }
 
+@GetMapping("/availableTechnicians")
+public ResponseEntity<?> avialableTechnician(Integer issueid,HttpSession session){
+	return service.avialableTechnician(issueid,session);
+}
+
+
 @PostMapping("/assigneIssuestoTechnician")  //assign button when admin clicks issue
-public ResponseEntity<?> issuedToTechnician(@RequestParam Integer issueid,HttpSession session){
-	return service.issuedToTechnician(issueid,session);
+public ResponseEntity<?> issuedToTechnician(@RequestParam Integer issueid,Integer techid,HttpSession session){
+	return service.issuedToTechnician(issueid,techid,session);
 }
 
 
